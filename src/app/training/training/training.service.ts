@@ -1,24 +1,28 @@
-import { Exercise } from './exercise.model';
 import { Subject } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from 'angularfire2/firestore';
 import { map } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
+
+import { Exercise } from './exercise.model';
 
 @Injectable()
 export class TrainingService {
-    private availableExercises: Exercise[] = [];
-    private runningExercise: Exercise;    
     //Avaliable exercises from firestore
     exercisesChanged: Subject<Exercise[]> = new Subject<Exercise[]>();
     //exercise perform by the user
     exerciseChanged: Subject<Exercise> = new Subject<Exercise>();    
     //Exercises finished by the user
     finishedExercisesChanged: Subject<Exercise[]> = new Subject<Exercise[]>();    
+    private availableExercises: Exercise[] = [];
+    private runningExercise: Exercise;    
+    private fbSubs: Subscription[] = [];
+
 
     constructor(private db: AngularFirestore){}
 
     fetchAvaliableExercises() {
-       this.db   
+      this.fbSubs.push(this.db   
         .collection('avaliableExercises')
         .snapshotChanges()
         .pipe(          
@@ -35,8 +39,8 @@ export class TrainingService {
         ).subscribe((exercises: Exercise[]) => {
             this.availableExercises = exercises;
             this.exercisesChanged.next([...this.availableExercises]);
-        })
-    }
+        }))        
+    };
 
     startExercise(selectedId: string) {
         this.db.doc('avaliableExercises/' + selectedId).update({lastSelected: new Date()})
@@ -71,14 +75,19 @@ export class TrainingService {
     }
     
     fetchCompletedOrCancelledExercises(){
-        this.db
+        this.fbSubs.push(this.db   
             .collection('finishedExercises')
             .valueChanges()
             .subscribe((exercises: Exercise[]) => {
                 this.finishedExercisesChanged.next(exercises);
-        });        
+        }));        
     }
 
+    cancelSubscriptions() {
+        this.fbSubs.forEach(sub => {
+            sub.unsubscribe();
+        })
+    }
 
     private addDataToDatabase(exercise: Exercise) {
         this.db.collection('finishedExercises').add(exercise);
