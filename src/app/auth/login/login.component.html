@@ -22,6 +22,6 @@
             <mat-error>Please provide your password</mat-error>             
         </mat-form-field>
        <button *ngIf="!isLoading" type="submit" mat-raised-button color="primary" [disabled]="!formGroup.valid" onsubmit="onSubmit">Submit</button>
-       <mat-spinner *ngIf="isLoading"></mat-spinner>
+       <mat-spinner *ngIf="isLoading$ | async"></mat-spinner>
     </form>
 </section>
