@@ -1,10 +1,12 @@
 import { NgModule } from '@angular/core';
-import { Routes , RouterModule, Router} from '@angular/router'
-import { WelcomeComponent } from './welcome/welcome.component';
+import { Routes , RouterModule } from '@angular/router'
+
 import { AuthGuard } from './auth/auth.guard';
+import { WelcomeComponent } from './welcome/welcome.component';
 
 const routes: Routes = [
-    { path: '', component: WelcomeComponent  } 
+    { path: '', component: WelcomeComponent  }, 
+    { path: 'training', loadChildren: './training/training/training.module#TrainingModule'  } 
 ];
 
 @NgModule({
