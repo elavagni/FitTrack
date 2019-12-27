@@ -12,8 +12,7 @@ import * as fromRoot from '../../app.reducer';
 export class SidenavListComponent implements OnInit {
  
   @Output() closeSidenav  = new EventEmitter
-  isAuth$: Observable<boolean>;
-  
+  isAuth$: Observable<boolean>;  
 
   constructor(private authService: AuthService, private store: Store<fromRoot.State>) { }
 

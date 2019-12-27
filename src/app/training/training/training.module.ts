@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
+import { Store, StoreModule } from "@ngrx/store";
 
 import { CurrentTrainingComponent } from '../current-training/current-training.component';
 import { PastTrainingComponent } from '../past-training/past-training.component';
@@ -9,6 +10,7 @@ import { TrainingComponent } from './training.component';
 import { StopTrainingComponent } from '../current-training/stop-training-component';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { TrainingRoutingModule } from './training-routing.module';
+import { trainingReducer } from './training.reducer';
 
 
 
@@ -25,7 +27,8 @@ import { TrainingRoutingModule } from './training-routing.module';
         TrainingRoutingModule,               
         ReactiveFormsModule,
         AuthModule,
-        TrainingRoutingModule         
+        TrainingRoutingModule,   
+        StoreModule.forFeature('training', trainingReducer)      
     ],    
     entryComponents: [StopTrainingComponent]
 })
