@@ -1,29 +1,33 @@
 import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
 import { MatTableDataSource, MatSort, MatPaginator } from '@angular/material';
+
 import { TrainingService } from '../training/training.service';
 import { Exercise } from '../training/exercise.model';
-import { Subscription } from 'rxjs';
+import { Store } from "@ngrx/store";
+import * as fromTraining from '../training/training.reducer'
+
 
 @Component({
   selector: 'app-past-training',
   templateUrl: './past-training.component.html',
   styleUrls: ['./past-training.component.css']
 })
-export class PastTrainingComponent implements OnInit, AfterViewInit, OnDestroy {
+export class PastTrainingComponent implements OnInit, AfterViewInit {
 
   displayedColumns = ['date', 'name', 'duration', 'calories', 'state'];
   dataSource = new MatTableDataSource<Exercise>();
   @ViewChild(MatSort, {static: true}) sort: MatSort;
-  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-  private exerciseChangedSubscription: Subscription;
+  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;  
   
-  constructor(private trainingService: TrainingService) { }
+  constructor(private trainingService: TrainingService, 
+              private store: Store<fromTraining.TrainingState>) { }
 
   ngOnInit() {
-    this.exerciseChangedSubscription = this.trainingService.finishedExercisesChanged.subscribe(
+   this.store.select(fromTraining.getFinishedExercises).subscribe(
         (exercises: Exercise[]) => {
-        this.dataSource.data = exercises;
-    })
+          this.dataSource.data = exercises;
+        }
+    );
     this.trainingService.fetchCompletedOrCancelledExercises();
   }
 
@@ -35,12 +39,4 @@ export class PastTrainingComponent implements OnInit, AfterViewInit, OnDestroy {
   doFilter(filterValue: string) {
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
-
-  ngOnDestroy(): void {
-    if (this.exerciseChangedSubscription) {
-      this.exerciseChangedSubscription.unsubscribe();
-    }    
-    
-  }
-
 }
